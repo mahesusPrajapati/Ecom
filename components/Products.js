@@ -1,33 +1,76 @@
 import React, { useEffect, useState } from "react";
-import DetailsModel from "./DetailsModel";
+import { UseFetch } from "./UseFetch";
+import Model from "./Model";
+import axios from "axios";
+import Loading from "./Loading";
 
 const Products = () => {
   const [products, setProducts] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [productData, setProductData] = useState(null);
+
+  const openModal = () => {
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+  };
 
   useEffect(() => {
     getProducts();
+    getSingleProduct();
   }, []);
 
   const getProducts = () => {
-    fetch("https://fakestoreapi.com/products")
-      .then((res) => res.json())
-      .then((json) => {
-        console.log(json);
-        setProducts(json);
-      });
-  };
+    // fetch("https://fakestoreapi.com/products")
+    //   .then((res) => res.json())
+    //   .then((json) => {
+    //     console.log(json);
+    //     setProducts(json);
+    //   });
 
-  const handleChildData = (data) => {
+    const { data, error, loading } = UseFetch(
+      "https://fakestoreapi.com/products"
+    );
     console.log(data);
+    setProducts(data);
+    if (loading) {
+      return <Loading />;
+    }
   };
 
-  const data = {
-    greet: "Hello",
+  const getSingleProduct = async (id) => {
+    const { data, loading, error } = UseFetch(
+      `https://fakestoreapi.com/products/${id + 1}`
+    );
+    setProductData(data);
+    if (Object.keys(json).length === 0) {
+      console.log("Product data is empty");
+
+      setShowModal(true);
+    }
+
+    // try {
+    //   await fetch(`https://fakestoreapi.com/products/${id + 1}`).then((res) =>
+    //     res.json().then((json) => {
+    //       console.log(json);
+    //       setProductData(json);
+    //     })
+    //   );
+
+    //   if (Object.keys(json).length === 0) {
+    //     console.log("Product data is empty");
+
+    //     setShowModal(true);
+    //   }
+    // } catch (error) {
+    //   console.log(error);
+    // }
   };
 
   return (
     <>
-      <DetailsModel data={data} ondata={handleChildData} />
       <div className="artboard artboard-horizontal phone-6 content-around mx-auto w-fit">
         <p className="text-center text-3xl my-2 font-bold font-sans">
           Why should you choose us?
@@ -41,7 +84,7 @@ const Products = () => {
               stroke-width="1.5"
               stroke="currentColor"
               class="w-6 h-6"
-              className="w-20"
+              className="w-16"
             >
               <path
                 stroke-linecap="round"
@@ -63,7 +106,7 @@ const Products = () => {
               stroke-width="1.5"
               stroke="currentColor"
               class="w-6 h-6"
-              className="w-20 "
+              className="w-16"
             >
               <path
                 stroke-linecap="round"
@@ -85,7 +128,7 @@ const Products = () => {
               stroke-width="1.5"
               stroke="currentColor"
               class="w-6 h-6"
-              className="w-20 "
+              className="w-16"
             >
               <path
                 stroke-linecap="round"
@@ -96,7 +139,7 @@ const Products = () => {
 
             <p className="text-xl">Money-Back Guarantee</p>
             <p className="">
-              If an item arrived damaged or you've changed your mind, you can
+              If an item arrived damaged or you ve changed your mind, you can
               send it back for a full refund.
             </p>
           </div>
@@ -108,7 +151,7 @@ const Products = () => {
               stroke-width="1.5"
               stroke="currentColor"
               class="w-6 h-6"
-              className="w-20 "
+              className="w-16"
             >
               <path
                 stroke-linecap="round"
@@ -138,9 +181,14 @@ const Products = () => {
                 <div className="card-actions justify-end">
                   <p className="font-sans text-xl font-medium">$ {e.price}</p>
                   <button
+                    htmlFor="my-modal-4"
                     className="btn btn-primary"
                     onClick={() => {
                       console.log(id);
+                      getSingleProduct(id);
+                      // setProductId(id);
+                      // useGetSinProduct(id);
+                      openModal();
                     }}
                   >
                     Buy Now
@@ -151,6 +199,11 @@ const Products = () => {
           );
         })}
       </div>
+      <Model
+        showModal={showModal}
+        closeModal={closeModal}
+        singleProduct={productData}
+      />
     </>
   );
 };
